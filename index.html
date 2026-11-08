@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{ZETA🕷️STORE}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #09090b;
+            --card-bg: #121217;
+            --border: #27272a;
+            --text: #fafafa;
+            --text-muted: #a1a1aa;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--primary); display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .header-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-history {
+            background: var(--card-bg);
+            border: 1px solid var(--primary);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .btn-history:hover { background: var(--primary); color: white; }
+
+        .bcv-banner {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .tabs-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 10px;
+            background: #000;
+        }
+
+        .product-title { font-size: 1rem; font-weight: 600; }
+        .product-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .product-bcv { font-size: 0.75rem; color: var(--text-muted); }
+
+        .btn-buy {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            transition: 0.2s;
+        }
+        .btn-buy:hover { background: var(--primary-hover); }
+        .btn-buy:disabled { background: #333; cursor: not-allowed; color: #777; }
+
+        /* MODALES */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+        .form-group input, .form-group select, .form-group textarea {
+            background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            padding: 10px; border-radius: 8px; font-size: 0.9rem; outline: none;
+        }
+
+        .order-card {
+            background: var(--bg); border: 1px solid var(--border);
+            padding: 12px; border-radius: 10px; margin-bottom: 10px; font-size: 0.85rem;
+        }
+        .order-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .status-badge { font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+        .status-en-proceso { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .status-aprobado { background: rgba(34, 197, 94, 0.2); color: var(--success); border: 1px solid var(--success); }
+
+        /* ASISTENTE DE IA */
+        .ai-chat-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            background: var(--primary); color: white;
+            width: 55px; height: 55px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; cursor: pointer; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            z-index: 99; transition: 0.2s;
+        }
+        .ai-chat-btn:hover { transform: scale(1.05); }
+
+        .ai-chat-window {
+            display: none; position: fixed; bottom: 85px; right: 20px;
+            width: 340px; height: 440px; background: var(--card-bg);
+            border: 1px solid var(--border); border-radius: 14px;
+            z-index: 100; flex-direction: column; overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        .ai-chat-header {
+            background: var(--bg); padding: 12px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 0.9rem;
+        }
+        .ai-chat-messages {
+            flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem;
+        }
+        .ai-msg { padding: 8px 12px; border-radius: 8px; max-width: 85%; line-height: 1.3; }
+        .ai-msg-bot { background: var(--bg); border: 1px solid var(--border); align-self: flex-start; }
+        .ai-msg-user { background: var(--primary); color: white; align-self: flex-end; }
+        .ai-chat-input-area {
+            padding: 10px; border-top: 1px solid var(--border); display: flex; gap: 6px; background: var(--bg);
+        }
+        .ai-chat-input-area input {
+            flex: 1; background: var(--card-bg); border: 1px solid var(--border); color: white; padding: 8px; border-radius: 6px; font-size: 0.85rem; outline: none;
+        }
+
+        .empty-state { text-align: center; color: var(--text-muted); padding: 40px; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-top-bar">
+                <div class="bcv-banner">
+                    <i class="fa-solid fa-dollar-sign" style="color: var(--success);"></i>
+                    <span>Tasa BCV: <strong id="tasaDisplay">891,11</strong> Bs</span>
+                </div>
+                <button class="btn-history" onclick="abrirHistorial()">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Mis Pedidos
+                </button>
+            </div>
+            <h1>🕷️ {ZETA🕷️STORE}</h1>
+        </div>
+
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="cambiarCategoria('Ropa', this)">👕 Ropa</button>
+            <button class="tab-btn" onclick="cambiarCategoria('Gadgets', this)">💻 Tecnología</button>
+            <button class="tab-btn" onclick="cambiarCategoria('Recargas', this)">🎮 Recargas</button>
+        </div>
+
+        <div class="products-grid" id="contenedorProductos"></div>
+    </div>
+
+    <!-- ASISTENTE IA FLOTANTE -->
+    <div class="ai-chat-btn" onclick="toggleChatIA()"><i class="fa-solid fa-robot"></i></div>
+    <div class="ai-chat-window" id="chatIAWindow">
+        <div class="ai-chat-header">
+            <span>✨ Asistente IA -Zeta Store</span>
+            <button onclick="toggleChatIA()" style="background:transparent; border:none; color:white; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="ai-chat-messages" id="chatIAMessages">
+            <div class="ai-msg ai-msg-bot">¡Hola! Soy la IA de <b>{ZETA🕷️STORE}</b>. Puedo responder cualquier duda que tengas sobre ropa, tecnología, recargas de juegos o envíos. ¿En qué te ayudo?</div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" id="inputChatIA" placeholder="Hazme una pregunta..." onkeypress="if(event.key==='Enter') enviarMensajeIA()">
+            <button onclick="enviarMensajeIA()" style="background:var(--primary); border:none; color:white; padding:8px 12px; border-radius:6px; cursor:pointer;"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- MODAL CHECKOUT -->
+    <div class="modal-overlay" id="checkoutModal">
+        <div class="modal-box">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 8px;">🛒 Confirmar Pedido y Pago</h3>
+            
+            <div id="resumenProducto" style="background: var(--bg); padding: 10px; border-radius: 8px; font-size: 0.85rem;"></div>
+
+            <!-- DATOS DE PAGO MÓVIL VISIBLES AL CLIENTE -->
+            <div style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary); padding: 10px; border-radius: 8px; font-size: 0.82rem; line-height: 1.4;">
+                <p style="font-weight: 700; color: var(--primary); margin-bottom: 4px;"><i class="fa-solid fa-mobile-screen-button"></i> Datos para Pago Móvil:</p>
+                <p>🏦 <b>Banco:</b>Venezuela </p>
+                <p>📱 <b>Teléfono:</b> 0416-3757994</p>
+                <p>🆔 <b>Cédula / RIF:</b> V-33064523</p>
+                <p>🏦 <b>cuenta zinli:</b> yoibertovar9@gmail.com</p>
+            </div>
+
+            <div id="campoPaquetes" class="form-group" style="display: none;">
+                <label>Selecciona el Paquete:</label>
+                <select id="selectPaquete" onchange="actualizarTotalModal()"></select>
+            </div>
+
+            <div id="campoColores" class="form-group" style="display: none;">
+                <label>Selecciona el Color:</label>
+                <select id="selectColor"></select>
+            </div>
+
+            <div id="camposEnvioFisico" style="display: none; border-top: 1px dashed var(--border); padding-top: 8px; margin-top: 4px;">
+                <p style="font-size: 0.8rem; color: var(--primary); margin-bottom: 6px;">📦 Envío Nacional: Se sumarán <strong>+$2.00 USD</strong> de flete.</p>
+                <div class="form-group">
+                    <label>Cédula de Identidad:</label>
+                    <input type="text" id="inputCedula" placeholder="Ej: V-28123456">
+                </div>
+                <div class="form-group">
+                    <label>Dirección Completa de Envío:</label>
+                    <textarea id="inputDireccion" rows="2" placeholder="Estado, Ciudad, Referencia..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Empresa de Envío:</label>
+                    <select id="selectCourier">
+                        <option value="MRW">MRW (+$2.00)</option>
+                        <option value="Zoom">Zoom (+$2.00)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="camposDigital" class="form-group" style="display: none;">
+                <label>ID de Jugador / Cuenta:</label>
+                <input type="text" id="inputPlayerId" placeholder="Ej: 849201948">
+            </div>
+
+            <div class="form-group">
+                <label>Número de Referencia de Pago Móvil:</label>
+                <input type="text" id="inputReferencia" placeholder="Ej: 009847">
+            </div>
+
+            <div id="precioFinalBox" style="font-size: 1rem; font-weight: 700; text-align: right; color: var(--success); margin: 4px 0;"></div>
+
+            <button class="btn-buy" onclick="procesarEnvioPedido()">Enviar Reporte de Pago</button>
+            <button class="btn-buy" onclick="cerrarModal()" style="background: var(--danger); margin-top: -4px;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIAL -->
+    <div class="modal-overlay" id="historialModal">
+        <div class="modal-box">
+            <h3 style="border-bottom: 1px solid var(--border); padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span>📜 Mis Pedidos Recientes</span>
+                <button onclick="sincronizarDesdeNube()" style="background: transparent; border: none; color: var(--primary); cursor: pointer;"><i class="fa-solid fa-rotate"></i></button>
+            </h3>
+
+            <div id="listaPedidosCliente" style="max-height: 60vh; overflow-y: auto;"></div>
+            <button class="btn-buy" onclick="cerrarHistorial()" style="background: #333;">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        const CLOUD_BIN_ID = "6abe8d00ac6210605a09b0db";
+        const CLOUD_API_KEY = "$2a$10$9o1mpuJxrBvzWB2Po7jTZ.OD4/bDJ5Z2NjyD1YRqe78Z4MGZ7Wlxy";
+        const GEMINI_API_KEY = "AQ.Ab8RN6JGjn3bqjU8k_6FFnpO6haTfR_ktjQklWCHj4Bm4biRcw";
+
+        const TELEGRAM_BOT_TOKEN = "9027905155:AAGIsBv2wXDEze55xPsFVhEk8MGF05U1pWM";
+        const TELEGRAM_CHAT_ID = "8121133144";
+
+        let productos = JSON.parse(localStorage.getItem('zeta_productos')) || [];
+        let tasaBcv = localStorage.getItem('zeta_tasa') || "891,11";
+        let pedidosLocales = JSON.parse(localStorage.getItem('zeta_pedidos')) || [];
+        let categoriaActiva = 'Ropa';
+        let productoSeleccionado = null;
+        let historialConversacionIA = [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            actualizarInterfaz();
+            sincronizarDesdeNube();
+        });
+
+        async function sincronizarDesdeNube() {
+            try {
+                let res = await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': CLOUD_API_KEY }
+                });
+                if (res.ok) {
+                    let json = await res.json();
+                    if (json.record) {
+                        if (json.record.productos) productos = json.record.productos;
+                        if (json.record.tasa) tasaBcv = json.record.tasa;
+                        if (json.record.pedidos) pedidosLocales = json.record.pedidos;
+
+                        localStorage.setItem('zeta_productos', JSON.stringify(productos));
+                        localStorage.setItem('zeta_tasa', tasaBcv);
+                        localStorage.setItem('zeta_pedidos', JSON.stringify(pedidosLocales));
+                        actualizarInterfaz();
+                        renderizarPedidosCliente();
+                    }
+                }
+            } catch (e) { console.log("Modo local activo."); }
+        }
+
+        async function guardarEnNube(datosNube) {
+            try {
+                await fetch(`https://api.jsonbin.io/v3/b/${CLOUD_BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': CLOUD_API_KEY },
+                    body: JSON.stringify(datosNube)
+                });
+            } catch (e) { console.error("Error al guardar en la nube."); }
+        }
+
+        function actualizarInterfaz() {
+            document.getElementById('tasaDisplay').innerText = tasaBcv;
+            renderizarProductos();
+        }
+
+        function cambiarCategoria(cat, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            categoriaActiva = cat;
+            renderizarProductos();
+        }
+
+        function parsePrecioNum(precioStr) {
+            if (!precioStr) return 0;
+            let num = parseFloat(precioStr.toString().replace('$', '').trim());
+            return isNaN(num) ? 0 : num;
+        }
+
+        function calcularBs(usd) {
+            let tasaNum = parseFloat(tasaBcv.replace('.', '').replace(',', '.'));
+            if (isNaN(tasaNum)) return '0.00';
+            return (usd * tasaNum).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function renderizarProductos() {
+            const grid = document.getElementById('contenedorProductos');
+            grid.innerHTML = '';
+            let filtrados = productos.filter(p => p.categoria === categoriaActiva);
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = `<div class="empty-state">No hay productos en esta categoría.</div>`;
+                return;
+            }
+
+            filtrados.forEach((prod) => {
+                let realIndex = productos.indexOf(prod);
+                let img = prod.imagen || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500';
+                let precioDisplay = '', bsDisplay = '';
+
+                if (prod.categoria === 'Recargas') {
+                    if (prod.paquetes && prod.paquetes.length > 0) {
+                        let primerPrecio = parsePrecioNum(prod.paquetes[0].precio);
+                        precioDisplay = `Desde ${prod.paquetes[0].precio}`;
+                        bsDisplay = `~ ${calcularBs(primerPrecio)} Bs`;
+                    }
+                } else {
+                    let precioNum = parsePrecioNum(prod.precio);
+                    precioDisplay = prod.precio ? `$${precioNum.toFixed(2)}` : '$0.00';
+                    bsDisplay = `~ ${calcularBs(precioNum)} Bs`;
+                }
+
+                grid.innerHTML += `
+                    <div class="product-card">
+                        ${prod.agotado ? '<span class="badge-agotado" style="position:absolute; top:10px; right:10px; background:var(--danger); color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">AGOTADO</span>' : ''}
+                        <img src="${img}" class="product-img" alt="${prod.nombre}">
+                        <div class="product-title">${prod.nombre}</div>
+                        <div class="product-price">${precioDisplay}</div>
+                        <div class="product-bcv">${bsDisplay}</div>
+                        <button class="btn-buy" ${prod.agotado ? 'disabled' : ''} onclick="abrirCheckout(${realIndex})">
+                            ${prod.agotado ? 'Agotado' : 'Comprar Ahora'}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function abrirCheckout(index) {
+            productoSeleccionado = productos[index];
+            const isFisico = productoSeleccionado.categoria === 'Ropa' || productoSeleccionado.categoria === 'Gadgets';
+            
+            document.getElementById('resumenProducto').innerHTML = `<strong>Producto:</strong> ${productoSeleccionado.nombre}`;
+
+            const campoPaquetes = document.getElementById('campoPaquetes');
+            const selectPaquete = document.getElementById('selectPaquete');
+            if (productoSeleccionado.categoria === 'Recargas' && productoSeleccionado.paquetes) {
+                selectPaquete.innerHTML = '';
+                productoSeleccionado.paquetes.forEach((paq, i) => {
+                    selectPaquete.innerHTML += `<option value="${i}">${paq.nombre} - ${paq.precio}</option>`;
+                });
+                campoPaquetes.style.display = 'flex';
+            } else { campoPaquetes.style.display = 'none'; }
+
+            const campoColores = document.getElementById('campoColores');
+            const selectColor = document.getElementById('selectColor');
+            if (isFisico && productoSeleccionado.colores && productoSeleccionado.colores.length > 0) {
+                selectColor.innerHTML = '';
+                productoSeleccionado.colores.forEach(col => { selectColor.innerHTML += `<option value="${col}">${col}</option>`; });
+                campoColores.style.display = 'flex';
+            } else { campoColores.style.display = 'none'; }
+
+            document.getElementById('camposEnvioFisico').style.display = isFisico ? 'block' : 'none';
+            document.getElementById('camposDigital').style.display = !isFisico ? 'flex' : 'none';
+
+            actualizarTotalModal();
+            document.getElementById('checkoutModal').style.display = 'flex';
+        }
+
+        function actualizarTotalModal() {
+            if (!productoSeleccionado) return;
+            const isFisico = productoSeleccionado.categoria === 'Ropa' || productoSeleccionado.categoria === 'Gadgets';
+            let baseUsd = 0;
+            if (productoSeleccionado.categoria === 'Recargas') {
+                let idxPaq = document.getElementById('selectPaquete').value || 0;
+                if (productoSeleccionado.paquetes && productoSeleccionado.paquetes[idxPaq]) {
+                    baseUsd = parsePrecioNum(productoSeleccionado.paquetes[idxPaq].precio);
+                }
+            } else { baseUsd = parsePrecioNum(productoSeleccionado.precio); }
+
+            let totalUsd = baseUsd + (isFisico ? 2.00 : 0.00);
+            document.getElementById('precioFinalBox').innerHTML = `Total: $${totalUsd.toFixed(2)} USD <span style="font-size:0.8rem; color:var(--text-muted);">(${calcularBs(totalUsd)} Bs)</span>`;
+        }
+
+        function cerrarModal() { document.getElementById('checkoutModal').style.display = 'none'; }
+        function abrirHistorial() { renderizarPedidosCliente(); document.getElementById('historialModal').style.display = 'flex'; }
+        function cerrarHistorial() { document.getElementById('historialModal').style.display = 'none'; }
+
+        async function procesarEnvioPedido() {
+            const isFisico = productoSeleccionado.categoria === 'Ropa' || productoSeleccionado.categoria === 'Gadgets';
+            const referencia = document.getElementById('inputReferencia').value.trim();
+            if (!referencia) { alert("Ingresa la referencia de pago."); return; }
+
+            let detalleItem = productoSeleccionado.nombre;
+            let cedula = "N/A", direccion = "N/A", courier = "N/A", playerId = "N/A";
+
+            if (isFisico) {
+                cedula = document.getElementById('inputCedula').value.trim();
+                direccion = document.getElementById('inputDireccion').value.trim();
+                courier = document.getElementById('selectCourier').value;
+                if (!cedula || !direccion) { alert("Cédula y Dirección obligatorias."); return; }
+            } else {
+                playerId = document.getElementById('inputPlayerId').value.trim();
+                let idxPaq = document.getElementById('selectPaquete').value || 0;
+                if (productoSeleccionado.paquetes && productoSeleccionado.paquetes[idxPaq]) {
+                    detalleItem += ` (${productoSeleccionado.paquetes[idxPaq].nombre})`;
+                }
+                if (!playerId) { alert("Ingresa tu ID de Jugador."); return; }
+            }
+
+            let orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
+            let fechaStr = new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+            let nuevoPedido = {
+                id: orderId,
+                fecha: fechaStr,
+                producto: detalleItem, categoria: productoSeleccionado.categoria,
+                referencia, cedula, direccion, courier, playerId,
+                estado: "En Proceso", guia: ""
+            };
+
+            pedidosLocales.unshift(nuevoPedido);
+            localStorage.setItem('zeta_pedidos', JSON.stringify(pedidosLocales));
+            await guardarEnNube({ productos, tasa: tasaBcv, pedidos: pedidosLocales });
+
+            let mensajeTg = `🛒 *NUEVO PEDIDO REGISTRADO*\n\n`;
+            mensajeTg += `🆔 *Orden:* ${orderId}\n`;
+            mensajeTg += `📌 *Producto:* ${detalleItem}\n`;
+            mensajeTg += `🔢 *Referencia:* ${referencia}\n`;
+            
+            if (isFisico) {
+                mensajeTg += `👤 *Cédula:* ${cedula}\n`;
+                mensajeTg += `📦 *Agencia:* ${courier}\n`;
+                mensajeTg += `📍 *Dirección:* ${direccion}\n`;
+            } else {
+                mensajeTg += `🎮 *ID Jugador:* ${playerId}\n`;
+            }
+            mensajeTg += `\n⏰ *Fecha:* ${fechaStr}`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: mensajeTg,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            } catch (e) {
+                console.error("Error al notificar por Telegram", e);
+            }
+
+            alert("¡Pedido enviado con éxito! Revisa su estado en 'Mis Pedidos'.");
+            cerrarModal();
+            abrirHistorial();
+        }
+
+        function renderizarPedidosCliente() {
+            const container = document.getElementById('listaPedidosCliente');
+            container.innerHTML = '';
+            if (pedidosLocales.length === 0) {
+                container.innerHTML = `<div class="empty-state">No tienes pedidos recientes.</div>`;
+                return;
+            }
+            pedidosLocales.forEach(p => {
+                let badgeClase = p.estado === 'En Proceso' ? 'status-en-proceso' : 'status-aprobado';
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <strong>${p.id} - ${p.producto}</strong>
+                            <span class="status-badge ${badgeClase}">${p.estado}</span>
+                        </div>
+                        <p style="color:var(--text-muted);">Ref: ${p.referencia} | Fecha: ${p.fecha}</p>
+                        ${p.guia ? `<p style="color:var(--success); margin-top:4px;">🚚 Guía ${p.courier}: <strong>${p.guia}</strong></p>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // CONTROL ASISTENTE DE IA CONVERSACIONAL REAL
+        function toggleChatIA() {
+            const win = document.getElementById('chatIAWindow');
+            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        async function enviarMensajeIA() {
+            const input = document.getElementById('inputChatIA');
+            const textoUsuario = input.value.trim();
+            if (!textoUsuario) return;
+
+            const box = document.getElementById('chatIAMessages');
+            box.innerHTML += `<div class="ai-msg ai-msg-user">${textoUsuario}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            const idTemp = "msg-temp-" + Date.now();
+            box.innerHTML += `<div class="ai-msg ai-msg-bot" id="${idTemp}"><i>Pensando respuesta...</i></div>`;
+            box.scrollTop = box.scrollHeight;
+
+            let respuestaIA = "";
+
+            try {
+                historialConversacionIA.push({ role: "user", parts: [{ text: textoUsuario }] });
+                let systemInstruction = `Eres el asistente virtual amable de la tienda {YOIBER🕷️STORE}. Respondes en español de forma fluida, corta y humana. Tasa BCV: ${tasaBcv} Bs. Envíos de ropa y tecnología por MRW/Zoom cobran +$2 flete. Recargas digitales solicitan ID de jugador.`;
+
+                let response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [
+                            { role: "user", parts: [{ text: systemInstruction }] },
+                            ...historialConversacionIA
+                        ]
+                    })
+                });
+
+                let data = await response.json();
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    respuestaIA = data.candidates[0].content.parts[0].text;
+                    historialConversacionIA.push({ role: "model", parts: [{ text: respuestaIA }] });
+                }
+            } catch (err) {
+                console.log("Error consultando API:", err);
+            }
+
+            if (!respuestaIA) {
+                let lower = textoUsuario.toLowerCase();
+                if (lower.includes('hola') || lower.includes('buenas') || lower.includes('que tal')) {
+                    respuestaIA = "¡Hola! ¿Cómo estás? Dime qué estás buscando hoy o en qué te puedo colaborar.";
+                } else if (lower.includes('tasa') || lower.includes('dolar') || lower.includes('bcv')) {
+                    respuestaIA = `La tasa del dólar oficial BCV que estamos manejando en este momento es de ${tasaBcv} Bs.`;
+                } else if (lower.includes('envio') || lower.includes('mrw') || lower.includes('zoom') || lower.includes('flete')) {
+                    respuestaIA = "Realizamos envíos a todo el país a través de MRW y Zoom. Para productos físicos (ropa o tecnología) se agregan $2.00 USD por el flete.";
+                } else if (lower.includes('recarga') || lower.includes('free fire') || lower.includes('diamantes')) {
+                    respuestaIA = "¡Claro! En la pestaña 'Recargas' puedes elegir tus paquetes de Free Fire u otros juegos. Solo necesitas colocar tu ID de jugador al momento de pagar.";
+                } else if (lower.includes('pago') || lower.includes('transferencia') || lower.includes('pagomovil')) {
+                    respuestaIA = "Aceptamos Pago Móvil en bolívares calculados a la tasa BCV del día. Al pagar solo ingresas el número de referencia.";
+                } else {
+                    respuestaIA = `Entiendo perfectamente. Sobre "${textoUsuario}", si necesitas hacer un pedido o consultar sobre algún producto de la tienda, ¡con gusto te ayudo!`;
+                }
+            }
+
+            document.getElementById(idTemp).outerHTML = `<div class="ai-msg ai-msg-bot">${respuestaIA}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
+</html>
